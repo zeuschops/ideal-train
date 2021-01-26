@@ -23,7 +23,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
     YTDL_OPTIONS = {
         "format":"bestaudio/best",
         "extractaudio": True,
-        "audioformat":"m4a",
+        "audioformat":"mp3",
         "outtmpl":"%(extractor)s-%(id)s-%(title)s.%(ext)s",
         "restrictfilenames":True,
         "noplaylist":True,
@@ -64,10 +64,10 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.likes = data.get('like_count')
         self.dislikes = data.get('dislike_count')
         self.stream_url = data.get('url')
-    
+
     def __str__(self):
         return '**{0.title}** by **{0.uploader}**'.format(self)
-    
+
     @classmethod
     async def create_source(cls, ctx:commands.Context, search:str, *, loop:asyncio.BaseEventLoop = None):
         loop = loop or asyncio.get_event_loop()
@@ -77,7 +77,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         if data is None:
             raise YTDLError("Couldn't find anything that matches `{}`".format(search))
-        
+
         if 'entries' not in data:
             process_info = data
         else:
@@ -88,14 +88,14 @@ class YTDLSource(discord.PCMVolumeTransformer):
                     break
             if process_info is None:
                 YTDLError("Couldn't find anything that matches `{}`".format(search))
-        
+
         webpage_url = process_info['webpage_url']
         partial = functools.partial(cls.ytdl.extract_info, webpage_url, download=False)
         processed_info = await loop.run_in_executor(None, partial)
 
         if processed_info is None:
             raise YTDLError ("Couldn't fetch `{}`".format(webpage_url))
-        
+
         if 'entries' not in processed_info:
             info = processed_info
         else:
@@ -106,7 +106,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
                 except IndexError:
                     raise YTDLError("Couldn't retrieve any matches for `{}`".format(webpage_url))
         return cls(ctx, discord.FFmpegPCMAudio(info['url'], **cls.FFMPEG_OPTIONS), data=info)
-    
+
     @staticmethod
     def parse_duration(duration:int) -> str:
         minutes, seconds = divmod(duration, 60)
@@ -122,14 +122,14 @@ class YTDLSource(discord.PCMVolumeTransformer):
         if seconds > 0:
             duration.append('{} seconds'.format(seconds))
         return ','.join(duration)
-    
+
 class Song:
     __slots__ = ('source', 'requester')
 
     def __init__(self, source:YTDLSource):
         self.source = source
         self.requester = source.requester
-    
+
     def create_embed(self):
         embed = (discord.Embed(title='Now playing', description='```css\n{0.source.title}\n```'.format(self),color=discord.Color.blurple())
         .add_field(name='Duration', value=self.source.duration)
@@ -371,7 +371,7 @@ class Music(commands.Cog):
             return await ctx.send('Not playing any music right now...')
 
         voter = ctx.message.author
-        if voter == ctx.voice_state.current.requester:
+        if voter == ctx.voice_state.current.requester or voter.permissions_in(ctx.channel).administrator:
             await ctx.message.add_reaction('⏭')
             ctx.voice_state.skip()
 
