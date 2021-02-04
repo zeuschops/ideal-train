@@ -133,7 +133,7 @@ class Song:
     def create_embed(self):
         embed = (discord.Embed(title='Now playing', description='```css\n{0.source.title}\n```'.format(self),color=discord.Color.blurple())
         .add_field(name='Duration', value=self.source.duration)
-        .add_field(name='Requested by', value=self.requester.mention)
+        .set_footer(text='Requested by ' + self.requester.mention)
         .add_field(name='Uploader', value='[{0.source.uploader}]({0.source.uploader_url})'.format(self))
         .add_field(name="URL", value="[Click]({0.source.url})".format(self))
         .set_thumbnail(url=self.source.thumbnail))
@@ -206,10 +206,6 @@ class VoiceState:
             self.next.clear()
 
             if not self.loop:
-                # Try to get the next song within 3 minutes.
-                # If no song will be added to the queue in time,
-                # the player will disconnect due to performance
-                # reasons.
                 try:
                     async with timeout(180):  # 3 minutes
                         self.current = await self.songs.get()
@@ -219,7 +215,7 @@ class VoiceState:
 
             self.current.source.volume = self._volume
             self.voice.play(self.current.source, after=self.play_next_song)
-            await self.current.source.channel.send(embed=self.current.create_embed())
+            await self.current.source.channel.send(embed=self.current.create_embed(), delete_after=15)
 
             await self.next.wait()
 
@@ -330,7 +326,9 @@ class Music(commands.Cog):
     async def _now(self, ctx: commands.Context):
         """Displays the currently playing song."""
 
-        await ctx.send(embed=ctx.voice_state.current.create_embed())
+        await ctx.send(embed=ctx.voice_state.current.create_embed(), delete_after=10)
+        await asyncio.sleep(10)
+        await ctx.message.delete()
 
     @commands.command(name='pause')
     @commands.has_permissions(manage_guild=True)
@@ -426,7 +424,10 @@ class Music(commands.Cog):
         """Removes a song from the queue at a given index."""
 
         if len(ctx.voice_state.songs) == 0:
-            return await ctx.send('Empty queue.')
+            await ctx.send('Empty queue.', delete_after=10)
+            await asyncio.sleep(10)
+            await ctx.message.delete()
+            return
 
         ctx.voice_state.songs.remove(index - 1)
         await ctx.message.add_reaction('✅')
