@@ -476,3 +476,18 @@ class Music(commands.Cog):
         if ctx.voice_client:
             if ctx.voice_client.channel != ctx.author.voice.channel:
                 raise commands.CommandError('Bot is already in a voice channel.')
+
+    @commands.command(name='onesec')
+    async def onesec(self, ctx):
+        if not ctx.voice_state.voice:
+            await ctx.invoke(self._join)
+        async with ctx.typing():
+            try:
+                source = await YTDLSource.create_source(ctx, "https://www.youtube.com/watch?v=xNjyG8S4_kI", loop=self.bot.loop)
+            except YTDLError as e:
+                await ctx.send("An error occurred while processing this request...")
+            else:
+                song = Song(source)
+
+                await ctx.voice_state.songs.put(song)
+                await ctx.send("Enqueued {}".format(str(source)))
