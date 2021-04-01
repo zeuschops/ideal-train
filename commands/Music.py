@@ -30,7 +30,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         "nocheckcertificate":True,
         "ignoreerrors":False,
         "logtostderr":False,
-        "quiet":True,
+        "quiet":False,
         "no_warnings":True,
         "default_search":"auto",
         "source_address":"0.0.0.0",
@@ -459,6 +459,7 @@ class Music(commands.Cog):
 
         async with ctx.typing():
             try:
+                print("Search query: \"" + search +"\"")
                 source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
             except YTDLError as e:
                 await ctx.send('An error occurred while processing this request: {}'.format(str(e)))

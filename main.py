@@ -5,8 +5,10 @@ from discord.ext import commands
 from commands.AdministratorCommands import AdministratorCommands
 from commands.VersionRequests import VersionRequests
 from commands.Music import Music
+#from commands.WGUCourses import WGUCourses
+from commands.RiotGamesAPI import RiotGamesAPI
 
-bot = commands.Bot(command_prefix="??")
+bot = commands.Bot(command_prefix="!")
 
 f = open('config.json','r')
 config = json.loads(f.read())
@@ -17,8 +19,11 @@ async def on_ready():
     bot.add_cog(Music(bot))
     bot.add_cog(VersionRequests(bot))
     bot.add_cog(AdministratorCommands(bot))
+    #bot.add_cog(WGUCourses(bot))
+    bot.add_cog(RiotGamesAPI(bot, config['riot-api']))
     print("Logged in as {0.user}".format(bot))
     print("\twith client id {0.user.id}".format(bot))
+    await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="My prefix is now !", type=1))
 
 @bot.event
 async def on_message(message):
