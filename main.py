@@ -20,11 +20,11 @@ async def on_ready():
     bot.add_cog(Music(bot))
     bot.add_cog(VersionRequests(bot))
     bot.add_cog(AdministratorCommands(bot))
-    #bot.add_cog(WGUCourses(bot))
+    bot.add_cog(WGUCourses(bot))
     bot.add_cog(RiotGamesAPI(bot, config['riot-api']))
     print("Logged in as {0.user}".format(bot))
     print("\twith client id {0.user.id}".format(bot))
-    await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="My prefix is now !", type=1))
+    #await bot.change_presence(status=discord.Status.online, activity=discord.CustomActivity(name="My prefix is now !"))
 
 @bot.event
 async def on_message(message):

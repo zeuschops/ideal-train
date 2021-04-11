@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import requests
+import json
 
 class WGUCourses(commands.Cog):
     def __init__(self, bot):
@@ -8,8 +8,10 @@ class WGUCourses(commands.Cog):
     
     @commands.command()
     async def course(self, ctx, course:str):
-        resp = requests.get('http://localhost:20090/wgu/courses/' + course)
-        if resp.status_code != 200:
-            await ctx.send('Unknown error occurred. Status code: ' + str(resp.status_code))
+        f = open('../helper files/CourseDump.json','r')
+        d = json.loads(f.read())
+        f.close()
+        if course.upper() in list(d):
+            await ctx.send(course + ' has course named, ' + d[course.upper()])
         else:
-            await ctx.send(course + ' has course named, ' + resp.json()['course_name'])
+            await ctx.send("Unknown course.")
