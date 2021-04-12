@@ -8,10 +8,10 @@ class WGUCourses(commands.Cog):
     
     @commands.command()
     async def course(self, ctx, course:str):
-        f = open('../helper files/CourseDump.json','r')
+        f = open('helpers/CourseDump.json','r')
         d = json.loads(f.read())
         f.close()
         if course.upper() in list(d):
-            await ctx.send(course + ' has course named, ' + d[course.upper()])
+            await ctx.send(course + ' is a course named ' + d[course.upper()])
         else:
-            await ctx.send("Unknown course.")
+            await ctx.send("Unknown course for id %s." % course)

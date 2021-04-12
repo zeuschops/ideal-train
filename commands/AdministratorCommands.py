@@ -1,16 +1,22 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands import has_permissions#, is_in_guild
+import time
 
 class AdministratorCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
+    @has_permissions(ban_members=True)
     async def ban(self, ctx, member:discord.Member):
-        await member.guild.ban(member)
-        await ctx.send("%s#%s (%s) has been banned.".format(member.name, str(member.discriminator), str(member.id)))
+        perms = ctx.message.author.permissions_in(ctx.channel)
+        if perms.ban_members or perms.administrator:
+            await member.guild.ban(member)
+            await ctx.send("%s#%s (%s) has been banned.".format(member.name, str(member.discriminator), str(member.id)))
 
     @commands.command()
+    @has_permissions(kick_members=True)
     async def kick(self, ctx, member:discord.Member):
         user_perms = ctx.message.author.permissions_in(ctx.channel)
         if user_perms.kick_members or user_perms.administrator:
@@ -20,10 +26,24 @@ class AdministratorCommands(commands.Cog):
             await ctx.send("You do not have permission to use this command.", timeout=15)
 
     @commands.command()
-    async def clear(self, ctx, count:int):
+    @has_permissions(manage_messages=True)
+    async def clean(self, ctx, count:int):
         user_perms = ctx.message.author.permissions_in(ctx.channel)
         if user_perms.administrator or user_perms.manage_messages:
             await ctx.channel.purge(limit=count)
             await ctx.send("Deleted " + str(count) + " messages", delete_after=10)
         else:
             await ctx.send("You do not have permission to use this command.", timeout=15)
+    
+#    @commands.command(name="reload", hidden=True)
+#    @commands.is_owner()
+#    @is_in_guild(609654287600975874)
+#    async def _reload(self, ctx, *, module:str):
+#        try:
+#            self.bot.reload_extension(module)
+#        except commands.ExtensionError as e:
+#            await ctx.send(f'{e.__class__.__name__}: {e}')
+#        else:
+#            await ctx.send(module + ' reloaded.', delete_after=10)
+#            time.sleep(10)
+#            await ctx.message.delete()

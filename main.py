@@ -6,10 +6,15 @@ import asyncio
 from commands.AdministratorCommands import AdministratorCommands
 from commands.VersionRequests import VersionRequests
 from commands.Music import Music
-#from commands.WGUCourses import WGUCourses
+from commands.WGUCourses import WGUCourses
 from commands.RiotGamesAPI import RiotGamesAPI
+#from commands.TempCommands import TempCommands
 
-bot = commands.Bot(command_prefix="!")
+intents = discord.Intents.default()
+intents.members = True
+prefix = "!"
+
+bot = commands.Bot(command_prefix=prefix, intents=intents)
 
 f = open('config.json','r')
 config = json.loads(f.read())
@@ -22,13 +27,19 @@ async def on_ready():
     bot.add_cog(AdministratorCommands(bot))
     bot.add_cog(WGUCourses(bot))
     bot.add_cog(RiotGamesAPI(bot, config['riot-api']))
+    #bot.add_cog(TempCommands(bot))
     print("Logged in as {0.user}".format(bot))
     print("\twith client id {0.user.id}".format(bot))
-    #await bot.change_presence(status=discord.Status.online, activity=discord.CustomActivity(name="My prefix is now !"))
+    #await bot.change_presence(status=discord.Status.online, activity=discord.CustomActivity(name="My prefix is !"))
+    await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="my prefix is " + prefix))
 
 @bot.event
 async def on_message(message):
-    await bot.process_commands(message)
+    if '!bubo ' not in message.content:
+        await bot.process_commands(message)
+    #if message.guild:
+        #if message.guild.id == 600152872767979523:
+            #TODO: Record message data
 
 @bot.command()
 async def ping(ctx):
@@ -38,13 +49,13 @@ async def ping(ctx):
 
 @bot.command()
 async def github(ctx):
-    await ctx.channel.send("See me on GitHub! https://github.com/zeuschops/ideal-train", delete_after=10)
+    await ctx.channel.send("See me on GitHub! https://github.com/zeuschops/idea-train", delete_after=10)
     await asyncio.sleep(10)
     await ctx.message.delete()
 
 @bot.command()
 async def invite(ctx):
-    await ctx.channel.send("Invite me to your server! https://discord.com/oauth2/authorize?client_id=799451713735622666&scope=bot&perms=309668928", delete_after=10)
+    await ctx.channel.send("Invite me to your server! https://discord.com/oauth2/authorize?client_id=799451713735622666&scope=bot&permissions=309668928", delete_after=10)
     await asyncio.sleep(10)
     await ctx.message.delete()
 
