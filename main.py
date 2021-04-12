@@ -43,20 +43,26 @@ async def on_message(message):
 
 @bot.command()
 async def ping(ctx):
-    await ctx.channel.send(str(int(round(bot.latency * 1000,0))) + " ms", delete_after=15)
-    await asyncio.sleep(15)
-    await ctx.message.delete()
+    can_delete = bot.user.permissions_in(ctx.channel).manage_messages
+    await ctx.channel.send(str(int(round(bot.latency * 1000,0))) + " ms", delete_after=15 if can_delete else None)
+    if can_delete:
+        await asyncio.sleep(15)
+        await ctx.message.delete()
 
 @bot.command()
 async def github(ctx):
-    await ctx.channel.send("See me on GitHub! https://github.com/zeuschops/idea-train", delete_after=10)
-    await asyncio.sleep(10)
-    await ctx.message.delete()
+    can_delete = bot.user.permissions_in(ctx.channel).manage_messages
+    await ctx.channel.send("See me on GitHub! https://github.com/zeuschops/idea-train", delete_after=10 if can_delete else None)
+    if can_delete:
+        await asyncio.sleep(10)
+        await ctx.message.delete()
 
 @bot.command()
 async def invite(ctx):
-    await ctx.channel.send("Invite me to your server! https://discord.com/oauth2/authorize?client_id=799451713735622666&scope=bot&permissions=309668928", delete_after=10)
-    await asyncio.sleep(10)
-    await ctx.message.delete()
+    can_delete = bot.user.permissions_in(ctx.channel).manage_messages
+    await ctx.channel.send("Invite me to your server! https://discord.com/oauth2/authorize?client_id=799451713735622666&scope=bot&permissions=309668928", delete_after=10 if can_delete else None)
+    if can_delete:
+        await asyncio.sleep(10)
+        await ctx.message.delete()
 
 bot.run(config['token'], bot=True, reconnect=True)
