@@ -73,7 +73,7 @@ async def on_message(message):
                             "footer":embed.footer
                         } for embed in message.embeds
                     ],
-                    "timestamp":message.created_at
+                    "timestamp":message.created_at.strftime("%Y-%m-%d %H:%M:%S")
                 }
             }
         })
@@ -103,7 +103,7 @@ async def on_message(message):
                         "footer":embed.footer
                     } for embed in message.embeds
                 ],
-                "timestamp":message.created_at
+                "timestamp":message.created_at.strftime("%Y-%m-%d %H:%M:%S")
             }
         })
     f = open('activity-data.json','w')
