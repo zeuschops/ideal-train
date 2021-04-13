@@ -2,6 +2,7 @@ import json
 import discord
 from discord.ext import commands
 import asyncio
+import os
 
 from commands.AdministratorCommands import AdministratorCommands
 from commands.VersionRequests import VersionRequests
@@ -13,6 +14,12 @@ from commands.RiotGamesAPI import RiotGamesAPI
 intents = discord.Intents.default()
 intents.members = True
 prefix = "!"
+
+activity_data = {}
+if 'activity-data.json' in os.listdir('helpers/'):
+    f = open('helpers/activity-data.json','r')
+    activity_data = json.loads(f.read())
+    f.close()
 
 bot = commands.Bot(command_prefix=prefix, intents=intents)
 
@@ -37,9 +44,78 @@ async def on_ready():
 async def on_message(message):
     if '!bubo ' not in message.content:
         await bot.process_commands(message)
-    #if message.guild:
-        #if message.guild.id == 600152872767979523:
-            #TODO: Record message data
+    if 'message' not in list(activity_data):
+        activity_data.update({'message':{}})
+    if str(message.guild.id) not in list(activity_data['message']):
+        activity_data['message'].update({
+            str(message.guild.id):{
+                str(message.id):{
+                    "author":{
+                        "id":message.author.id,
+                        "name":message.author.name,
+                        "discrim":message.author.discriminator,
+                        "nickname":message.author.nick
+                    },
+                    "content":message.content,
+                    "embeds":[
+                        {
+                            "url":embed.url,
+                            "title":embed.title,
+                            "color":embed.colour,
+                            "description":embed.description,
+                            "fields":[
+                                {
+                                    "title":field.title,
+                                    "description":field.description
+                                } for field in embed.fields
+                            ],
+                            "thumbnail":embed.thumbnail,
+                            "footer":embed.footer
+                        } for embed in message.embeds
+                    ],
+                    "timestamp":message.created_at
+                }
+            }
+        })
+    else:
+        activity_data['message'][str(message.guild.id)].update({
+            str(message.id): {
+                "author": {
+                    "id":message.author.id,
+                    "name":message.author.name,
+                    "discrim":message.author.discriminator,
+                    "nickname":message.author.nick
+                },
+                "content":message.content,
+                "embeds":[
+                    {
+                        "url":embed.url,
+                        "title":embed.title,
+                        "color":embed.colour,
+                        "description":embed.description,
+                        "fields":[
+                            {
+                                "title":field.title,
+                                "description":field.description
+                            } for field in embed.fields
+                        ],
+                        "thumbnail":embed.thumbnail,
+                        "footer":embed.footer
+                    } for embed in message.embeds
+                ],
+                "timestamp":message.created_at
+            }
+        })
+    f = open('activity-data.json','w')
+    f.write(json.dumps(activity_data, indent=4, separators=(',',':')))
+    f.close()
+
+#TODO:     
+#@bot.event
+#async def on_message_edit(before, after):
+#    if 'message_edit' not in list(activity_data):
+#        activity_data.update({'message_edit'})
+#    else:
 
 @bot.command()
 async def ping(ctx):
