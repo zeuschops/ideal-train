@@ -1,3 +1,6 @@
+import discord
+from discord.ext import commands
+
 import sqlite3 as sqlite
 
 class SQLRecorder:
@@ -5,5 +8,4 @@ class SQLRecorder:
         self.sqlite_file = sqlite.connect(filename)
         self.cursor = self.sqlite_file.cursor()
     
-    def create_message_table(self):
-        
+    def new_message(self, message:discord.Message):
