@@ -41,7 +41,14 @@ async def on_message(message):
 
 @bot.command()
 async def ping(ctx):
-    can_delete = bot.user.permissions_in(ctx.channel).manage_messages
+    can_delete = False
+    try:
+        can_delete = bot.user.permissions_in(ctx.channel).manage_messages
+    except:
+        print("Probably no user perms established yet, not deleting messages.")
+        print("\tMessage ID:", ctx.message.id)
+        print("\tGuild ID:", ctx.guild.id)
+        print("\tTimestamp:", ctx.message.created_at.strftime("%Y-%m-%d %H:%M:%S"))
     await ctx.channel.send(str(int(round(bot.latency * 1000,0))) + " ms", delete_after=15 if can_delete else None)
     if can_delete:
         await asyncio.sleep(15)
@@ -49,7 +56,14 @@ async def ping(ctx):
 
 @bot.command()
 async def github(ctx):
-    can_delete = bot.user.permissions_in(ctx.channel).manage_messages
+    can_delete = False
+    try:
+        can_delete = bot.user.permissions_in(ctx.channel).manage_messages
+    except:
+        print("Probably no user perms established yet, not deleting messages.")
+        print("\tMessage ID:", ctx.message.id)
+        print("\tGuild ID:", ctx.guild.id)
+        print("\tTimestamp:", ctx.message.created_at.strftime("%Y-%m-%d %H:%M:%S"))
     await ctx.channel.send("See me on GitHub! https://github.com/zeuschops/idea-train", delete_after=10 if can_delete else None)
     if can_delete:
         await asyncio.sleep(10)
@@ -57,7 +71,14 @@ async def github(ctx):
 
 @bot.command()
 async def invite(ctx):
-    can_delete = bot.user.permissions_in(ctx.channel).manage_messages
+    can_delete = False
+    try:
+        can_delete = bot.user.permissions_in(ctx.channel).manage_messages
+    except:
+        print("Probably no user perms established yet, not deleting messages.")
+        print("\tMessage ID:", ctx.message.id)
+        print("\tGuild ID:", ctx.guild.id)
+        print("\tTimestamp:", ctx.message.created_at.strftime("%Y-%m-%d %H:%M:%S"))
     await ctx.channel.send("Invite me to your server! https://discord.com/oauth2/authorize?client_id=799451713735622666&scope=bot&permissions=309668928", delete_after=10 if can_delete else None)
     if can_delete:
         await asyncio.sleep(10)
