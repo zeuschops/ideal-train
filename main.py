@@ -6,7 +6,7 @@ import os
 
 from commands.AdministratorCommands import AdministratorCommands
 from commands.VersionRequests import VersionRequests
-#from commands.Music import Music
+from commands.Music import Music
 from commands.WGUCourses import WGUCourses
 from commands.RiotGamesAPI import RiotGamesAPI
 #from commands.TempCommands import TempCommands
@@ -24,7 +24,7 @@ f.close()
 @bot.event
 async def on_ready():
     #Temporarily commenting out the Music portion of this bot so we can add this feature to one that boots with my PC or Mac..
-    #bot.add_cog(Music(bot))
+    bot.add_cog(Music(bot))
     bot.add_cog(VersionRequests(bot))
     bot.add_cog(AdministratorCommands(bot))
     bot.add_cog(WGUCourses(bot))
