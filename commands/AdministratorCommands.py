@@ -1,11 +1,16 @@
 import discord
 from discord.ext import commands
-from discord.ext.commands import has_permissions#, is_in_guild
+from discord.ext.commands import has_permissions, is_in_guild
 import time
 
 class AdministratorCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    def is_owner():
+        async def predicate(ctx):
+            return ctx.author.id == 454598334448009216 #My personal ID
+        return commands.check(predicate)
 
     @commands.command()
     @has_permissions(ban_members=True)
@@ -34,16 +39,10 @@ class AdministratorCommands(commands.Cog):
             await ctx.send("Deleted " + str(count) + " messages", delete_after=10)
         else:
             await ctx.send("You do not have permission to use this command.", timeout=15)
-    
-#    @commands.command(name="reload", hidden=True)
-#    @commands.is_owner()
-#    @is_in_guild(609654287600975874)
-#    async def _reload(self, ctx, *, module:str):
-#        try:
-#            self.bot.reload_extension(module)
-#        except commands.ExtensionError as e:
-#            await ctx.send(f'{e.__class__.__name__}: {e}')
-#        else:
-#            await ctx.send(module + ' reloaded.', delete_after=10)
-#            time.sleep(10)
-#            await ctx.message.delete()
+
+    @commands.command(hidden=True)
+    @is_owner()
+    @is_in_guild(609654287600975874) #In my personal guild
+    async def restart(self, ctx, *, module:str):
+        await self.bot.logout()
+        print("Disconnected from Discord and closed all connections...")

@@ -6,14 +6,17 @@ import os
 
 from commands.AdministratorCommands import AdministratorCommands
 from commands.VersionRequests import VersionRequests
-#from commands.Music import Music
+from commands.Music import Music
 from commands.WGUCourses import WGUCourses
 from commands.RiotGamesAPI import RiotGamesAPI
 #from commands.TempCommands import TempCommands
+from helpers.SQLRecorder import SQLRecorder
 
 intents = discord.Intents.default()
 intents.members = True
 prefix = "!"
+
+recorder = SQLRecorder()
 
 bot = commands.Bot(command_prefix=prefix, intents=intents)
 
@@ -23,8 +26,7 @@ f.close()
 
 @bot.event
 async def on_ready():
-    #Temporarily commenting out the Music portion of this bot so we can add this feature to one that boots with my PC or Mac..
-    #bot.add_cog(Music(bot))
+    bot.add_cog(Music(bot))
     bot.add_cog(VersionRequests(bot))
     bot.add_cog(AdministratorCommands(bot))
     bot.add_cog(WGUCourses(bot))
@@ -38,6 +40,19 @@ async def on_ready():
 async def on_message(message):
     if '!bubo ' not in message.content:
         await bot.process_commands(message)
+    recorder.new_message(message)
+
+@bot.event
+async def edit_message(before:discord.Message, after:discord.Message):
+    recorder.edit_message(after)
+
+@bot.event
+async def on_member_join(member:discord.Member):
+    recorder.member_joined(member)
+
+@bot.event
+async def on_member_remove(member:discord.Member):
+    recorder.member_left(member)
 
 @bot.command()
 async def ping(ctx):
@@ -84,4 +99,4 @@ async def invite(ctx):
         await asyncio.sleep(10)
         await ctx.message.delete()
 
-bot.run(config['token'], bot=True, reconnect=True)
+bot.run(config['token'], bot=True)
