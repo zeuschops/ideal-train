@@ -131,3 +131,4 @@ config.json
 .DS_Store
 *.sqlite
 activity-data.json
+sample-*.json

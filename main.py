@@ -16,7 +16,10 @@ intents = discord.Intents.default()
 intents.members = True
 prefix = "!"
 
+needs_init = "default.sqlite" not in os.listdir('./')
 recorder = SQLRecorder('default.sqlite')
+if needs_init:
+    recorder.initialize()
 
 bot = commands.Bot(command_prefix=prefix, intents=intents)
 
