@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from discord.ext.commands import has_permissions, is_in_guild
+from discord.ext.commands import has_permissions
 import time
 
 class AdministratorCommands(commands.Cog):
@@ -10,6 +10,11 @@ class AdministratorCommands(commands.Cog):
     def is_owner():
         async def predicate(ctx):
             return ctx.author.id == 454598334448009216 #My personal ID
+        return commands.check(predicate)
+    
+    def is_in_guild(guild_id):
+        async def predicate(ctx):
+            return ctx.guild.id == guild_id
         return commands.check(predicate)
 
     @commands.command()

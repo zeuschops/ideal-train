@@ -16,7 +16,7 @@ intents = discord.Intents.default()
 intents.members = True
 prefix = "!"
 
-recorder = SQLRecorder()
+recorder = SQLRecorder('default.sqlite')
 
 bot = commands.Bot(command_prefix=prefix, intents=intents)
 
