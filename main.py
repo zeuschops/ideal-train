@@ -2,20 +2,13 @@ import json
 import discord
 from discord.ext import commands
 import asyncio
-import os
 
-from commands.VersionRequests import VersionRequests
 from commands.Music import Music
 from commands.RiotGamesAPI import RiotGamesAPI
 
 intents = discord.Intents.default()
 intents.members = True
 prefix = "!"
-
-needs_init = "default.sqlite" not in os.listdir('./')
-recorder = SQLRecorder('default.sqlite')
-if needs_init:
-    recorder.initialize()
 
 bot = commands.Bot(command_prefix=prefix, intents=intents)
 
@@ -26,7 +19,6 @@ f.close()
 @bot.event
 async def on_ready():
     bot.add_cog(Music(bot))
-    bot.add_cog(VersionRequests(bot))
     bot.add_cog(RiotGamesAPI(bot, config['riot-api']))
     print("Logged in as {0.user}".format(bot))
     print("\twith client id {0.user.id}".format(bot))
