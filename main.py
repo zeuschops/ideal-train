@@ -4,13 +4,9 @@ from discord.ext import commands
 import asyncio
 import os
 
-from commands.AdministratorCommands import AdministratorCommands
 from commands.VersionRequests import VersionRequests
 from commands.Music import Music
-from commands.WGUCourses import WGUCourses
 from commands.RiotGamesAPI import RiotGamesAPI
-#from commands.TempCommands import TempCommands
-from helpers.SQLRecorder import SQLRecorder
 
 intents = discord.Intents.default()
 intents.members = True
@@ -31,31 +27,14 @@ f.close()
 async def on_ready():
     bot.add_cog(Music(bot))
     bot.add_cog(VersionRequests(bot))
-    bot.add_cog(AdministratorCommands(bot))
-    bot.add_cog(WGUCourses(bot))
     bot.add_cog(RiotGamesAPI(bot, config['riot-api']))
-    #bot.add_cog(TempCommands(bot))
     print("Logged in as {0.user}".format(bot))
     print("\twith client id {0.user.id}".format(bot))
     await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="my prefix is " + prefix))
 
 @bot.event
 async def on_message(message):
-    if '!bubo ' not in message.content:
-        await bot.process_commands(message)
-    recorder.new_message(message)
-
-@bot.event
-async def edit_message(before:discord.Message, after:discord.Message):
-    recorder.edit_message(after)
-
-@bot.event
-async def on_member_join(member:discord.Member):
-    recorder.member_joined(member)
-
-@bot.event
-async def on_member_remove(member:discord.Member):
-    recorder.member_left(member)
+    await bot.process_commands(message)
 
 @bot.command()
 async def ping(ctx):
@@ -101,5 +80,27 @@ async def invite(ctx):
     if can_delete:
         await asyncio.sleep(10)
         await ctx.message.delete()
+
+@bot.command()
+async def clean(self, ctx, count:int):
+    user_perms = ctx.message.author.permissions_in(ctx.channel)
+    if user_perms.administrator or user_perms.manage_messages:
+        await ctx.channel.purge(limit=count)
+        await ctx.send("Deleted " + str(count) + " messages", delete_after=10)
+    else:
+        await ctx.send("You do not have permission to use this command.", timeout=15)
+
+@commands.command()
+async def checkrainVersion(self, ctx):
+    home_req = requests.get('https://checkra.in')
+    link_idx = str(home_req.content)[2:-1].index('href="/releases/')
+    link_str = str(home_req.content)[link_idx + 2 + len('href="'):]
+    link_str = link_str[:link_str.index('">')]
+    version_str = link_str.split('/')[-1]
+    download_req = requests.get('https://checkra.in' + link_str)
+    download_idx = str(download_req.content)[2:-1].index('href="https://assets.checkra.in/')
+    download_str = str(download_req.content)[2 + download_idx + len('href="'): -1]
+    download_str = download_str[:download_str.index('" ')]
+    await ctx.channel.send('The current checkra1n version is: ' + version_str + '. The latest download link (for Mac) is: <' + download_str + '>')
 
 bot.run(config['token'], bot=True)
